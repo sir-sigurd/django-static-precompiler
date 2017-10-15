@@ -22,9 +22,10 @@ def test_inlinecompile_tag(monkeypatch):
     monkeypatch.setattr("static_precompiler.utils.get_compiler_by_name", get_compiler_by_name)
 
     template = django.template.Template(
-        "{% load compile_static %}{% inlinecompile compiler='sass' %}source{% endinlinecompile %}"
+        "{% load compile_static %}"
+        "{% inlinecompile compiler='sass' %}source {{ context_variable }}{% endinlinecompile %}"
     )
-    assert template.render(django.template.Context({})) == "compiled"
+    assert template.render(django.template.Context({'context_variable': 'context_variable_value'})) == "compiled"
 
     assert get_compiler_by_name.calls == [pretend.call("sass")]
-    assert compiler.compile_source.calls == [pretend.call("source")]
+    assert compiler.compile_source.calls == [pretend.call("source context_variable_value")]
